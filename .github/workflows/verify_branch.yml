@@ -1,0 +1,100 @@
+
+# This is a workflow is for testing and building feature branches
+name: Feature Branch Test
+
+on: 
+  push:
+    branches-ignore:
+    - 'main'
+
+env:
+  REGISTRY: ghcr.io
+  REPOSITORY: ${{ github.repository }}
+  FRONTEND_IMAGE_NAME: se-5g00dm04/2023---final-project-team-autumn-frontend
+  BACKEND_IMAGE_NAME: se-5g00dm04/2023---final-project-team-autumn-backend
+jobs:
+  # Job for testing the frontend and backend code changes
+  test:
+    # running on ubuntu
+    runs-on: ubuntu-latest
+
+    name: Branch Tests
+    steps:
+      # Fetch the code using the checkout action
+      - name: Fetch Code
+        uses: actions/checkout@v3
+      # Installing a Node LTS version
+      - name: Install Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18"
+      # Installing the node modules for the frontend
+      - name: Install Frontend Dependencies
+        working-directory: ./frontend
+        run: npm install
+      # Running the tests for the frontend code
+      - name: Run Frontend Tests
+        working-directory: ./frontend
+        # this command needs to be added to the frontend package.json
+        run: npm run test:ci
+      # Installing the node modules for the backend
+      - name: Install Backend Dependencies
+        working-directory: ./backend
+        run: npm install
+      # Running the linter and tests for the backend code
+      - name: Run Backend Tests
+        working-directory: ./backend
+        run: npm run lint && npm run test
+
+# Job for building the frontend and backend container images and pushing it to the registry
+  build:
+    runs-on: ubuntu-latest
+    # Test job needs to succeed
+    name: Container Build Test
+    needs: test
+    # Give the job permission to write packages to the registry
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      # Fetch the code using the checkout action
+      - name: Fetch Code
+        uses: actions/checkout@v3
+      # Installing the node modules for the frontend
+      - name: Install Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18"
+      # Setting up the Docker build environment
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      # Loggin into the GitHub container registry
+      - name: Docker Login
+        uses: docker/login-action@v3.0.0
+        with:
+          # The GitHub registry
+          registry: ${{ env.REGISTRY }}
+          # The person that triggered the build
+          username: ${{ github.actor }}
+          # A special GitHub secret token we can use
+          password: ${{ secrets.GITHUB_TOKEN }}
+      # Building and pushing the frontend image to the registry using an action
+      - name: Build and push Docker Frontend images
+        uses: docker/build-push-action@v5.0.0
+        with:
+          context: ./frontend
+          file: ./frontend/DockerfileServer
+          push: false
+          tags: "${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}"
+      # Building and pushing the backend image to the registry using an action
+      - name: Build and push Docker Backend images
+        uses: docker/build-push-action@v5.0.0
+        with:
+          context: ./backend
+          file: ./backend/DockerfileServer
+          push: false
+          tags: "${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}"
+
+          

@@ -1,0 +1,22 @@
+
+@hostname = localhost
+
+@port = 4000
+
+@host = http://{{hostname}}:{{port}}
+
+GET {{host}}
+###
+GET {{host}}/api/shoppingList
+
+###
+POST {{host}}/api/shoppingList
+Content-Type:  application/json
+
+{
+    "item": "apple"
+}
+
+###
+DELETE {{host}}/api/shoppingList/86
+

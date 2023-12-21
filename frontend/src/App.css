@@ -1,0 +1,69 @@
+:root {
+  --primary-color: #4a90e2;
+  --secondary-color: #34495e;
+  --light-grey: #f1f1f1;
+  --font-primary: 'Arial', sans-serif;
+ }
+ body {
+  background-color: var(--primary-color);
+  font-family: var(--font-primary);
+ }
+ 
+ .App {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  color: var(--secondary-color);
+ }
+ 
+ /* Style the header with a background color, centered text, and white color */
+ .App-header {
+  background-color: var(--light-grey);
+  color: var(--secondary-color);
+  text-align: center;
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 20px;
+ }
+ 
+ /* Style the shopping list */
+ ul {
+  padding: 4;
+ }
+ 
+ li {
+  background-color: var(--light-grey);
+  padding: 15px;
+  margin: 10px 0;
+  border-radius: 5px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+ }
+
+ 
+ /* Style the buttons for checking and deleting items */
+ button {
+  background-color: var(--light-grey);
+  border-color: black;
+  border-width: 1px;
+  border-radius: 5px;
+  padding: 8px 12px;
+  margin-left: 10px;
+ }
+
+ button:hover {
+  background-color: rgb(221, 218, 215);
+ }
+ 
+ /* Style the input field for adding new items */
+ input[type="text"] {
+  border-color: black;
+  border-width: 1px;
+  border-radius: 5px;
+  padding: 8px 12px;
+  margin-right: 10px;
+ }
+
+ 

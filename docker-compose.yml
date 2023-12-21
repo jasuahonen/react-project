@@ -1,0 +1,21 @@
+
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - '3000:3000'
+    volumes:
+      - './frontend:/opt/app'
+    environment:
+      - "CI: 'true'"
+    restart: always
+  backend:
+    build:
+      context: ./backend
+    ports:
+      - '4000:4000'
+    volumes:
+      - './backend:/opt/app'
+    restart: always

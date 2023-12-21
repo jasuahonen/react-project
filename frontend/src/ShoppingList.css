@@ -1,0 +1,11 @@
+.cuisine-info {
+  font-size: 170px;
+  margin-top: 8px;
+}
+
+/* Additional styling for input fields */
+input {
+  width: 100px; /* Adjust the width as needed */
+  margin: 4px; /* Add some margin for spacing */
+}
+

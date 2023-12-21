@@ -1,0 +1,73 @@
+
+# This is a workflow is for testing and building feature branches that makes changes to the frontend
+name: Frontend PR Verification
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push events for all branches other than the "main" branch
+  push:
+    branches-ignore:
+      - "main"
+
+# This ignores all tag pushes
+    tags-ignore:
+      - "**"
+    # Triggers for changes to the frontend directory
+    paths:
+      - frontend/**
+    
+env:
+  REGISTRY: ghcr.io
+  REPOSITORY: ${{ github.repository }}
+  FRONTEND_IMAGE_NAME: se-5g00dm04/final-autumn-frontend
+  BACKEND_IMAGE_NAME: se-5g00dm04/final-autumn-backend
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This is the test job
+  test:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    # Name of the job as it will be displayed in GitHub
+    name: Frontend test run
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: Fetch code
+        uses: actions/checkout@v3
+      # Install node LTS version
+      - name: Install node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      # Install the dependencies for the frontend
+      - name: Install frontend dependecies
+        working-directory: ./frontend
+        run: npm install
+      # Test the frontend code
+      - name: Testing frontend project
+        working-directory: ./frontend
+        run: npm run test:ci
+
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    # Name of the job as it will be displayed in GitHub
+    name: Frontend test container build
+    needs: test
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: Fetch code
+        uses: actions/checkout@v3
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: Setup Docker Build
+        uses: docker/setup-buildx-action@v3
+      # Building and pushing the frontend image to the registry using an action
+      - name: Build and push Docker Frontend images
+        uses: docker/build-push-action@v5.0.0
+        with:
+          context: ./frontend
+          file: ./frontend/DockerfileServer
+          push: false
+          tags: "${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}"
